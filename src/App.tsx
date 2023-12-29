@@ -1,16 +1,19 @@
 import { ChangeEvent, useState } from "react";
-import { Box, Button, Container, TextField } from "@mui/material";
-import axios from "axios";
+import { Box, Button, Container, Snackbar, TextField } from "@mui/material";
+import axios, { isAxiosError } from "axios";
 
 function App() {
   const [value, setValue] = useState("");
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string>("");
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    setError("");
+    setSuccess(false);
     event.preventDefault();
     console.log("value: ", value);
 
@@ -30,8 +33,14 @@ function App() {
       setSuccess(true);
       setValue("");
     } catch (error) {
-      setSuccess(false);
       console.error(error);
+      if (isAxiosError(error)) {
+        setError(
+          error?.response ? error.response.data.message : "There was an error"
+        );
+      } else {
+        setError("There was an error");
+      }
     }
   };
   return (
@@ -43,7 +52,18 @@ function App() {
         <TextField label="Content" onChange={handleChange} multiline />
         <Button type="submit">Submit</Button>
       </form>
-      {success && <p>Content sent to your phone successfully!</p>}
+      <Snackbar
+        open={success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess(false)}
+        message="Content sent to your phone successfully!"
+      />
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError("")}
+        message={error}
+      />
     </Container>
   );
 }
