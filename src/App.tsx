@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
   Container,
   FormControl,
+  IconButton,
   Snackbar,
   TextField,
+  useTheme,
 } from "@mui/material";
 import axios, { isAxiosError } from "axios";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { theme } from "./config/theme";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 const schema = zod.object({
   content: zod.string().refine((value) => value.trim().length > 0, {
@@ -19,10 +24,13 @@ const schema = zod.object({
 });
 type FormData = zod.infer<typeof schema>;
 
+const ColorModeContext = createContext({ toggleColorMode: () => {} });
+
 function App() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const currentTheme = useTheme();
+  const colorMode = useContext(ColorModeContext);
   const {
     register,
     formState: { errors, isSubmitSuccessful },
@@ -79,6 +87,17 @@ function App() {
     <Container>
       <Box paddingTop="60px">
         <h1>Clip Client</h1>
+        <IconButton
+          sx={{ ml: 1 }}
+          onClick={colorMode.toggleColorMode}
+          color="inherit"
+        >
+          {theme.palette.mode === "dark" ? (
+            <Brightness7Icon />
+          ) : (
+            <Brightness4Icon />
+          )}
+        </IconButton>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box display="flex" flexDirection="column">
