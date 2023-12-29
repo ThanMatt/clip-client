@@ -4,14 +4,16 @@ Clip Client lets you transfer texts and links from a Windows/Linux PC to an iPho
 
 ## Requirements
 
-- **[Node.js](https://nodejs.org/en/download)**: Version 20.10.0
-- **[Yarn](https://yarnpkg.com/getting-started/install)**: Used for package management
+- **[Node.js](https://nodejs.org/en/download)**: Version 20.10.0.
+- **[Yarn](https://yarnpkg.com/getting-started/install)**: Used for package management.
+- **[Git](https://git-scm.com/downloads)**: Used for cloning or to make changes for this repository.
 
 ## Setup
 
-1. **Install Node.js and Yarn**: Ensure you have Node.js 20.10.0  and Yarn installed.
+1. **Install Node.js and Yarn**: Ensure you have Node.js 20.10.0 and Yarn installed.
 2. **Clone the Repo**: `git clone https://github.com/ThanMatt/clip-client`.
 3. **Install Dependencies**: In the project directory, run `yarn install`.
+4. **Run Clip Server**: Ensure your [Clip server](https://github.com/ThanMatt/clip-server) is running.
 
 ## Usage
 
