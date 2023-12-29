@@ -7,6 +7,7 @@ Clip Client lets you transfer texts and links from a Windows/Linux PC to an iPho
 - **[Node.js](https://nodejs.org/en/download)**: Version 20.10.0.
 - **[Yarn](https://yarnpkg.com/getting-started/install)**: Used for package management.
 - **[Git](https://git-scm.com/downloads)**: Used for cloning or to make changes for this repository.
+- **[Clip Server](https://github.com/ThanMatt/clip-server)**: Used for creating a communication between this application and your phone.
 
 ## Setup
 
