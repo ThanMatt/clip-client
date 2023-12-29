@@ -1,27 +1,48 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Box, Button, Container, Snackbar, TextField } from "@mui/material";
 import axios, { isAxiosError } from "axios";
+import { useForm } from "react-hook-form";
+import * as zod from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = zod.object({
+  content: zod
+    .string()
+    // :: Remove whitespaces
+    .transform((value) => value.replace(/\s+/g, ""))
+    .pipe(zod.string().min(1, { message: "This field is required" })),
+});
+type FormData = zod.infer<typeof schema>;
 
 function App() {
-  const [value, setValue] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string>("");
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
-  };
+  const {
+    register,
+    formState: { errors, isSubmitSuccessful },
+    handleSubmit,
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset();
+    }
+  }, [isSubmitSuccessful, reset]);
+
+  const onSubmit = async (values: FormData) => {
     setError("");
     setSuccess(false);
-    event.preventDefault();
-    console.log("value: ", value);
+    console.log("value: ", values.content);
 
     try {
       await axios.post(
         "http://localhost:4000/content",
         {
-          content: value,
+          content: values.content,
         },
         {
           headers: {
@@ -31,7 +52,6 @@ function App() {
       );
 
       setSuccess(true);
-      setValue("");
     } catch (error) {
       console.error(error);
       if (isAxiosError(error)) {
@@ -48,8 +68,14 @@ function App() {
       <Box paddingTop="60px">
         <h1>Clip Client</h1>
       </Box>
-      <form onSubmit={handleSubmit}>
-        <TextField label="Content" onChange={handleChange} multiline />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <TextField
+          label="Content"
+          helperText={errors.content?.message}
+          error={!!errors.content}
+          multiline
+          {...register("content")}
+        />
         <Button type="submit">Submit</Button>
       </form>
       <Snackbar
