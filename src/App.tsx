@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, Container, Snackbar, TextField } from "@mui/material";
 import axios, { isAxiosError } from "axios";
 import { useForm } from "react-hook-form";
@@ -6,11 +6,9 @@ import * as zod from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = zod.object({
-  content: zod
-    .string()
-    // :: Remove whitespaces
-    .transform((value) => value.replace(/\s+/g, ""))
-    .pipe(zod.string().min(1, { message: "This field is required" })),
+  content: zod.string().refine((value) => value.trim().length > 0, {
+    message: "This field is required",
+  }),
 });
 type FormData = zod.infer<typeof schema>;
 
