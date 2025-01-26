@@ -4,20 +4,20 @@ CLIP Client lets you transfer texts and links from a Windows/Linux PC to an iPho
 
 ## Requirements
 
-- **[Node.js](https://nodejs.org/en/download)**: Version 20.10.0.
-- **[Yarn](https://yarnpkg.com/getting-started/install)**: Used for package management.
+- **[Node.js](https://nodejs.org/en/download)**: Version 22.12.0.
+- **[pnpm](https://pnpm.io/)**: Used for package management.
 - **[Git](https://git-scm.com/downloads)**: Used for cloning or to make changes for this repository.
 - **[CLIP Server](https://github.com/ThanMatt/clip-server)**: Used for creating a communication between this application and your phone.
 
 ## Setup
 
-1. **Install Node.js and Yarn**: Ensure you have Node.js 20.10.0 and Yarn installed.
+1. **Install Node.js and pnpm**: Ensure you have Node.js 22.12.0 and pnpm installed.
 2. **Clone the Repo**: `git clone https://github.com/ThanMatt/clip-client`.
-3. **Install Dependencies**: In the project directory, run `yarn install`.
+3. **Install Dependencies**: In the project directory, run `pnpm install`.
 4. **Run CLIP Server**: Ensure your [CLIP Server](https://github.com/ThanMatt/clip-server) is running.
 
 ## Usage
 
-- **Development**: Run `yarn dev`.
-- **Build**: Run `yarn build`.
-- **Run**: Run `yarn start`.
+- **Development**: Run `pnpm dev`.
+- **Build**: Run `pnpm build`.
+- **Run**: Run `pnpm start`.
