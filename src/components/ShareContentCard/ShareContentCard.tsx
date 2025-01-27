@@ -20,7 +20,6 @@ import { Textarea } from "../ui/textarea";
 import { Subtle } from "../ui/typography";
 import { useEffect, useState } from "react";
 import * as zod from "zod";
-import axiosInstance from "@/config/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { isAxiosError } from "axios";
 import { useForm } from "react-hook-form";
@@ -40,7 +39,7 @@ type ShareContentCardProps = {
 const ShareContentCard = ({ targetServer }: ShareContentCardProps) => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("text");
+  const [, setActiveTab] = useState("text");
 
   const {
     register,
@@ -48,7 +47,6 @@ const ShareContentCard = ({ targetServer }: ShareContentCardProps) => {
     handleSubmit,
     setError,
     reset,
-    clearErrors,
     watch,
   } = useForm<FormData>({
     resolver: zodResolver(schema),

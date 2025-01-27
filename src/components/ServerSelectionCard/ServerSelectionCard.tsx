@@ -21,7 +21,7 @@ const ServerSelectionCard = ({ onTargetServer }: ServerSelectionCardProps) => {
   const [isScanning, setIsScanning] = useState(false);
   const [servers, setServers] = useState<Server[] | null>(null);
   const [dots, setDots] = useState("");
-  const [errors, setErrors] = useState<string | null>(null);
+  const [, setErrors] = useState<string | null>(null);
 
   const [selectedServer, setSelectedServer] = useState<Server | null>(null);
 
