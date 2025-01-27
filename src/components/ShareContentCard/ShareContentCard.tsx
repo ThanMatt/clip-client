@@ -22,8 +22,9 @@ import { useEffect, useState } from "react";
 import * as zod from "zod";
 import axiosInstance from "@/config/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isAxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
 import { useForm } from "react-hook-form";
+import { Server } from "@/types";
 
 const schema = zod.object({
   content: zod.string().refine((value) => value.trim().length > 0, {
@@ -32,7 +33,11 @@ const schema = zod.object({
 });
 type FormData = zod.infer<typeof schema>;
 
-const ShareContentCard = () => {
+type ShareContentCardProps = {
+  targetServer: Server | null;
+};
+
+const ShareContentCard = ({ targetServer }: ShareContentCardProps) => {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("text");
@@ -61,10 +66,26 @@ const ShareContentCard = () => {
     setLoading(true);
     setSuccess(false);
 
+    let server: string;
+
+    if (targetServer) {
+      server = `http://${targetServer.ip}:${targetServer.port}`;
+    } else {
+      server = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+    }
+
     try {
-      await axiosInstance.post("/content", {
-        content: values.content,
-      });
+      await axios.post(
+        targetServer ? `${server}/text` : `${server}/content`,
+        {
+          content: values.content,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       setSuccess(true);
       setLoading(false);
@@ -148,7 +169,7 @@ const ShareContentCard = () => {
             disabled={!!errors.content || loading || !content}
             type="submit"
           >
-            Send Content
+            Send Content {targetServer ? `to ${targetServer.deviceName}` : ""}
           </Button>
         </CardFooter>
       </form>

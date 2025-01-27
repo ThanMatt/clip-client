@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -7,15 +7,89 @@ import {
   CardDescription,
   CardContent,
 } from "../ui/card";
-import { RefreshCcw, Wifi, Server } from "lucide-react";
+import { RefreshCcw, Wifi, Server as ServerIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GetServersResponse, Server } from "@/types";
+import { Subtle } from "../ui/typography";
+import axiosInstance from "@/config/axios";
 
-const ServerSelectionCard = () => {
+type ServerSelectionCardProps = {
+  onTargetServer: (server: Server | null) => void;
+};
+
+const ServerSelectionCard = ({ onTargetServer }: ServerSelectionCardProps) => {
   const [isScanning, setIsScanning] = useState(false);
-  const [servers, setServers] = useState([
-    { id: "1", name: "Living Room PC", ip: "192.168.1.100", status: "online" },
-    { id: "2", name: "Office Laptop", ip: "192.168.1.101", status: "online" },
-  ]);
+  const [servers, setServers] = useState<Server[] | null>(null);
+  const [dots, setDots] = useState("");
+  const [errors, setErrors] = useState<string | null>(null);
+
+  const [selectedServer, setSelectedServer] = useState<Server | null>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+    }, 500);
+    return () => clearInterval(interval);
+  }, [isScanning]);
+
+  const handleSelectServer = (server: Server) => {
+    if (server.id === selectedServer?.id && selectedServer) {
+      onTargetServer(null);
+      setSelectedServer(null);
+    } else {
+      setSelectedServer(server);
+      onTargetServer(server);
+    }
+  };
+
+  const getServers = async () => {
+    const response = await axiosInstance.get<GetServersResponse>("/servers");
+    return response.data;
+  };
+
+  const handleGetServers = async () => {
+    setIsScanning(true);
+    const data = await getServers();
+
+    setIsScanning(false);
+    setServers(data.servers);
+  };
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchData = async () => {
+      try {
+        setIsScanning(true);
+
+        const data = await getServers();
+        if (mounted) {
+          setServers(data.servers);
+          setErrors(null);
+        }
+      } catch (err) {
+        if (mounted) {
+          setErrors("Failed to fetch data");
+          console.error("Polling error:", err);
+        }
+      } finally {
+        if (mounted) {
+          setIsScanning(false);
+        }
+      }
+    };
+
+    const pollInterval = setInterval(() => {
+      fetchData();
+    }, 5000); // :: Poll every 5 seconds
+
+    fetchData();
+
+    return () => {
+      mounted = false;
+      clearInterval(pollInterval);
+    };
+  }, []);
 
   return (
     <Card>
@@ -32,7 +106,7 @@ const ServerSelectionCard = () => {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => console.log("Scanning")}
+            onClick={handleGetServers}
             disabled={isScanning}
           >
             <RefreshCcw
@@ -44,7 +118,6 @@ const ServerSelectionCard = () => {
 
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Discovered Servers */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Wifi className="h-4 w-4" />
@@ -52,23 +125,35 @@ const ServerSelectionCard = () => {
             </div>
 
             <div className="space-y-2">
-              {servers.map((server) => (
-                <Button
-                  key={server.id}
-                  variant="outline"
-                  className="w-full justify-start h-auto py-3"
-                >
-                  <div className="flex items-start gap-3">
-                    <Server className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                    <div className="text-left">
-                      <div className="font-medium">{server.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {server.ip}
+              {servers && servers.length ? (
+                servers.map((server) => (
+                  <Button
+                    key={server.id}
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start h-auto py-3",
+                      selectedServer?.id === server.id
+                        ? "border-primary bg-primary-foreground"
+                        : ""
+                    )}
+                    onClick={() => handleSelectServer(server)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <ServerIcon className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                      <div className="text-left">
+                        <div className="font-medium">{server.deviceName}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {server.ip}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Button>
-              ))}
+                  </Button>
+                ))
+              ) : (
+                <div>
+                  <Subtle>Finding servers{dots}</Subtle>
+                </div>
+              )}
             </div>
           </div>
         </div>
