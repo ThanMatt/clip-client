@@ -7,17 +7,26 @@ import {
   CardDescription,
   CardContent,
 } from "../ui/card";
-import { RefreshCcw, Wifi, Server as ServerIcon } from "lucide-react";
+import { RefreshCcw, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GetServersResponse, Server } from "@/types";
+import { GetServersResponse, Server, Settings } from "@/types";
 import { Subtle } from "../ui/typography";
 import axiosInstance from "@/config/axios";
+import { ServerButton } from "../ServerButton";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
 
 type ServerSelectionCardProps = {
   onTargetServer: (server: Server | null) => void;
+  onChangeSettings: (updatedSettings: Settings) => void;
+  settings: Settings | null;
 };
 
-const ServerSelectionCard = ({ onTargetServer }: ServerSelectionCardProps) => {
+const ServerSelectionCard = ({
+  onTargetServer,
+  onChangeSettings,
+  settings,
+}: ServerSelectionCardProps) => {
   const [isScanning, setIsScanning] = useState(false);
   const [servers, setServers] = useState<Server[] | null>(null);
   const [dots, setDots] = useState("");
@@ -103,16 +112,38 @@ const ServerSelectionCard = ({ onTargetServer }: ServerSelectionCardProps) => {
               Connect to CLIP servers on your network
             </CardDescription>
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleGetServers}
-            disabled={isScanning}
-          >
-            <RefreshCcw
-              className={cn("h-4 w-4", isScanning ? "animate-spin" : "")}
-            />
-          </Button>
+          <div className="flex gap-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                onCheckedChange={() => {
+                  onChangeSettings({
+                    ...settings,
+                    discoverable: !settings?.discoverable,
+                  });
+                }}
+                id="discoverable"
+                checked={!!settings?.discoverable}
+              />
+              <Label
+                className={
+                  settings?.discoverable ? "font-medium" : "font-light"
+                }
+                htmlFor="discoverable"
+              >
+                Discoverable
+              </Label>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleGetServers}
+              disabled={isScanning}
+            >
+              <RefreshCcw
+                className={cn("h-4 w-4", isScanning ? "animate-spin" : "")}
+              />
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
@@ -127,27 +158,12 @@ const ServerSelectionCard = ({ onTargetServer }: ServerSelectionCardProps) => {
             <div className="space-y-2">
               {servers && servers.length ? (
                 servers.map((server) => (
-                  <Button
+                  <ServerButton
                     key={server.id}
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start h-auto py-3",
-                      selectedServer?.id === server.id
-                        ? "border-primary bg-primary-foreground"
-                        : ""
-                    )}
-                    onClick={() => handleSelectServer(server)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <ServerIcon className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
-                      <div className="text-left">
-                        <div className="font-medium">{server.deviceName}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {server.ip}
-                        </div>
-                      </div>
-                    </div>
-                  </Button>
+                    selectedServer={selectedServer}
+                    onSelectServer={handleSelectServer}
+                    server={server}
+                  />
                 ))
               ) : (
                 <div>
