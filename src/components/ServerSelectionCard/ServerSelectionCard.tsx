@@ -109,6 +109,14 @@ const ServerSelectionCard = ({
               Available Servers
             </CardTitle>
             <CardDescription>
+              Your CLIP server IP:{" "}
+              <Label>
+                {settings?.serverIp && settings?.serverPort
+                  ? `${settings?.serverIp}:${settings?.serverPort}`
+                  : "-"}
+              </Label>
+            </CardDescription>
+            <CardDescription>
               Connect to CLIP servers on your network
             </CardDescription>
           </div>
@@ -116,19 +124,23 @@ const ServerSelectionCard = ({
             <div className="flex items-center space-x-2">
               <Switch
                 onCheckedChange={() => {
-                  onChangeSettings({
-                    ...settings,
-                    discoverable: !settings?.discoverable,
-                  });
+                  if (settings) {
+                    onChangeSettings({
+                      ...settings,
+                      isDiscoverable: !settings?.isDiscoverable,
+                    });
+                  }
                 }}
-                id="discoverable"
-                checked={!!settings?.discoverable}
+                id="isDiscoverable"
+                checked={!!settings?.isDiscoverable}
               />
               <Label
                 className={
-                  settings?.discoverable ? "font-medium" : "font-light"
+                  settings?.isDiscoverable
+                    ? "font-medium"
+                    : "font-light text-muted-foreground"
                 }
-                htmlFor="discoverable"
+                htmlFor="isDiscoverable"
               >
                 Discoverable
               </Label>

@@ -16,5 +16,7 @@ export interface SendTextToServerArgs {
 }
 
 export interface Settings {
-  discoverable: boolean;
+  isDiscoverable: boolean;
+  serverIp: string;
+  serverPort: number;
 }
