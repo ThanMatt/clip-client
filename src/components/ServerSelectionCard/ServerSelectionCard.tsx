@@ -52,7 +52,9 @@ const ServerSelectionCard = ({
   };
 
   const getServers = async () => {
-    const response = await axiosInstance.get<GetServersResponse>("/servers");
+    const response = await axiosInstance.get<GetServersResponse>(
+      "/api/servers"
+    );
     return response.data;
   };
 

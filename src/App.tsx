@@ -10,7 +10,7 @@ function App() {
 
   useEffect(() => {
     const getSettings = async () => {
-      const response = await axiosInstance.get<Settings>("/settings");
+      const response = await axiosInstance.get<Settings>("/api/settings");
 
       setSettings(response.data);
     };
@@ -26,7 +26,7 @@ function App() {
     try {
       setSettings(updatedSettings);
 
-      await axiosInstance.patch("/settings", {
+      await axiosInstance.patch("/api/settings", {
         settings: updatedSettings,
       });
     } catch (error) {

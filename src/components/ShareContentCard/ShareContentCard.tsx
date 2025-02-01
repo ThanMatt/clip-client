@@ -74,7 +74,7 @@ const ShareContentCard = ({ targetServer }: ShareContentCardProps) => {
 
     try {
       await axios.post(
-        targetServer ? `${server}/text` : `${server}/content`,
+        targetServer ? `${server}/api/text` : `${server}/api/content`,
         {
           content: values.content,
         },
