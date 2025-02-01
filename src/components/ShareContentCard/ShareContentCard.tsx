@@ -69,7 +69,7 @@ const ShareContentCard = ({ targetServer }: ShareContentCardProps) => {
     if (targetServer) {
       server = `http://${targetServer.ip}:${targetServer.port}`;
     } else {
-      server = import.meta.env.VITE_API_URL ?? "http://localhost:4000";
+      server = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
     }
 
     try {
